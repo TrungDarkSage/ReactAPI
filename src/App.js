@@ -20,6 +20,8 @@ function App() {
 
   const [movies, setMovies] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   // // sample for Fetch
 
   // const fetchMovieHandler = () => {
@@ -47,20 +49,24 @@ function App() {
 
   // async await
   async function fetchMovieHandler() {
+    setIsLoading(true);
     const res = await fetch("https://swapi.dev/api/films/");
     const data = await res.json();
 
     const transform = data.results.map((movieData) => {
       return {
         id: movieData.episode_id,
-        director: movieData.director,
-        op: movieData.opening_crawl,
         title: movieData.title,
+        openingText: movieData.opening_crawl,
         releaseDate: movieData.release_date,
+        directorText: movieData.director,
+        // op: movieData.opening_crawl,
+        // opening_crawl: movieData.opening_crawl,
       };
     });
+    setIsLoading(false);
     setMovies(transform);
-    console.log(movies.title);
+    console.log(data);
   }
 
   return (
@@ -69,7 +75,41 @@ function App() {
         <button onClick={fetchMovieHandler}>Fetch Movies</button>
       </section>
       <section>
-        <MovieList movies={movies} />
+        {!isLoading && movies.length > 0 && <MovieList movies={movies} />}
+        {!isLoading && movies.length === 0 && <p>Not found film !!!</p>}
+        {isLoading && (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="xMidYMid"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              stroke="#646464"
+              fill="none"
+              stroke-width="5"
+            >
+              <animate
+                attributeName="stroke-dasharray"
+                dur="2s"
+                repeatCount="indefinite"
+                from="0,150"
+                to="150,150"
+                begin="0s"
+              />
+              <animate
+                attributeName="stroke-dashoffset"
+                dur="2s"
+                repeatCount="indefinite"
+                from="-75"
+                to="-225"
+                begin="0s"
+              />
+            </circle>
+          </svg>
+        )}
       </section>
     </>
   );
